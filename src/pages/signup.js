@@ -13,6 +13,7 @@ import AppleLogoB from "images/objects/apple-black.svg";
 import GoogleLogoB from "images/objects/google-black.svg";
 import AppleLogoW from "images/objects/apple-white.svg";
 import GoogleLogoW from "images/objects/google-white.svg";
+import FacebookLogin from 'react-facebook-login';
 
 const Apps = () => {
   const dispatch = useDispatch();
@@ -48,6 +49,8 @@ const Apps = () => {
         toastError("Something went wrong.");
       });
   };
+
+  const { REACT_APP_GOOGLE_CLIENT_ID, REACT_APP_FACEBOOK_CLIENT_ID } = process.env;
 
   return (
     <SignupPage>
@@ -265,27 +268,21 @@ const Apps = () => {
                 </div>
               </div>
             </div>
+            
+            
             <div style={{ width: "calc(50% - 5px)" }}>
-              <div
-                className='sign-up-option'
-                style={{
-                  width: "100%",
-                  borderRadius: "8px",
-                  textAlign: "center",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  color: "#0B0B1E",
-                  verticalAlign: "center",
-                  height: "50px",
-                }}
-              >
-                <img
-                  alt=''
-                  height='20px'
-                  style={{ marginTop: "15px" }}
-                  src={theme === "light" ? AppleLogoB : AppleLogoW}
-                />
-              </div>
+              <FacebookLogin
+                appId={REACT_APP_FACEBOOK_CLIENT_ID}
+                autoLoad={false}
+                fields="name,email,picture"
+                // callback={responseFacebook}
+                // render={renderProps => (
+                //   <div onClick={renderProps.onClick}></div>
+                // )}
+                version='12.0'
+                cssClass="btn-facebook"
+                icon="fa-facebook"
+              />
             </div>
           </div>
 
@@ -378,6 +375,39 @@ const SignupPage = styled.div`
   .input-group-text {
     background-color: white;
     border: none;
+  }
+  
+  .btn-facebook {
+    width: 100%;
+    font-family: Helvetica,sans-serif;
+    font-weight: 700;
+    -webkit-font-smoothing: antialiased;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 12px;
+    text-decoration: none;
+    transition: background-color .3s,border-color .3s;
+    background-color: #fff;
+    border: 0;
+    border-radius: 8px !important;
+    ft-radius: 8px;
+    font-size: 14px;
+    color: #4c69ba;
+    height: 50px;
+    text-align: center;
+  }
+
+  .btn-facebook:hover {
+      ${'' /* color: #fff; */}
+      opacity: 0.8;
+  }
+  .btn-facebook i.fa {
+    padding: 6px 10px;
+    background-color: #4c69ba;
+    color: #fff;
+    border-radius: 45%;
+    font-size: 25px;
+    margin-right: 15px;
   }
 `;
 

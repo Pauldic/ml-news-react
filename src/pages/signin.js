@@ -8,7 +8,7 @@ import { joiResolver } from "@hookform/resolvers/joi";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { toastSuccess, toastWarn, toastError } from "utils/toast";
-import { loginUser, loginGoogle } from "redux/authSlice";
+import { loginUser, loginGoogle, loginFacebook } from "redux/authSlice";
 import Logo from "../images/LOGO/logo.svg";
 import styled from "styled-components";
 import AppleLogoB from "images/objects/apple-black.svg";
@@ -16,6 +16,7 @@ import GoogleLogoB from "images/objects/google-black.svg";
 import AppleLogoW from "images/objects/apple-white.svg";
 import GoogleLogoW from "images/objects/google-white.svg";
 import GoogleLogin from 'react-google-login';
+import FacebookLogin from 'react-facebook-login';
 
 
 const Signin = () => {
@@ -48,26 +49,68 @@ const Signin = () => {
       });
   };
 
-  const { REACT_APP_GOOGLE_CLIENT_ID, REACT_APP_BACKEND_BASEURL, REACT_APP_REDIRECT_URL } = process.env;
+  const { REACT_APP_GOOGLE_CLIENT_ID, REACT_APP_FACEBOOK_CLIENT_ID } = process.env;
   
+  const onLogout = () => {
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
+    localStorage.removeItem('user')
+    window.location.reload()
+  }
+
   const onGoogleLoginSuccess = useCallback(
     response => {
-      console.log("Response*******", response)
-
       dispatch(loginGoogle(response.accessToken))
         .then((response) => {
           console.log('Susccess =========>');
           if(response.error){
-            toastError(response.payload.data.non_field_errors[0]);
             console.log("Error: \n",response.error)
-            console.log("Payload: \n",response.payload)
-            // TODO: DO What you want here bro
+            if(response.payload){
+              toastError(response.payload.data.non_field_errors[0]);
+              console.log("Payload: \n",response.payload)
+            }else if(response.error.message){
+              toastError(response.error.message);
+              console.log("Message: \n",response.error.message)
+            }
           }else{
-            toastSuccess(`It feels good `);
+            toastSuccess(`Successfully Signed in`);
+            console.log(response)
+            history.push("/");
           }
+          console.log('Susccess =========> End');
         })
         .catch(() => {
+          console.log('Failed =========> ');
           toastError("Something went wrong.");
+          console.log(response)
+          console.log('Failed =========> End');
+        });
+    }, []);
+
+  const responseFacebook = useCallback(
+    response => {
+      dispatch(loginFacebook(response.accessToken))
+        .then((response) => {
+          
+          console.log('Facebook Returned THEN=========>');
+          console.log(response);
+          console.log(response.accessToken);
+
+          if(response.error){
+            toastError(response.error.message);
+            console.log("Error: \n",response.error)
+          }else{
+            toastSuccess(`Successfully Signed in`);
+            history.push("/");
+          }
+          console.log('Facebook THEN***************************** END');
+        })
+        .catch(() => {
+          console.log('Facebook Returned CATCH=========>');
+          toastError("Something went wrong.");
+          console.log(response)
+          console.log(response.accessToken)
+          console.log('Facebook CATCH***************************** END');
         });
     }, []);
 
@@ -191,6 +234,7 @@ const Signin = () => {
             </span>
             <span></span>
           </div>
+          
           <div
             className='d-flex justify-content-between'
             style={{ marginTop: "1rem" }}
@@ -230,35 +274,25 @@ const Signin = () => {
                 }
                 accessType='offline'
                 onRequest={(res)=>{console.log("OnRequest: ", res)}}
-                uxMode='popup'
-                redirectUri={`${REACT_APP_BACKEND_BASEURL}${REACT_APP_REDIRECT_URL}`}
+                uxMode='popup'  //redirect | popup
                 cookiePolicy={'single_host_origin'}
                 // responseType="code"
               />
             </div>
 
-
-
             <div style={{ width: "calc(50% - 5px)" }}>
-              <div
-                className='sign-in-option'
-                style={{
-                  width: "100%",
-                  borderRadius: "8px",
-                  textAlign: "center",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  verticalAlign: "center",
-                  height: "50px",
-                }}
-              >
-                <img
-                  alt=''
-                  height='20px'
-                  style={{ marginTop: "15px" }}
-                  src={theme === "light" ? AppleLogoB : AppleLogoW}
-                />
-              </div>
+              <FacebookLogin
+                appId={REACT_APP_FACEBOOK_CLIENT_ID}
+                autoLoad={false}
+                fields="name,email,picture"
+                callback={responseFacebook}
+                render={renderProps => (
+                  <div onClick={renderProps.onClick}></div>
+                )}
+                version='12.0'
+                cssClass="btn-facebook"
+                icon="fa-facebook"
+              />
             </div>
           </div>
 
@@ -277,6 +311,8 @@ const Signin = () => {
             >
               Sign In
             </button>
+
+            {/* <button type="button" className="btn btn-dark btn-md btngroup" onClick={onLogout}>Logout</button> */}
           </div>
         </form>
       </div>
@@ -338,6 +374,39 @@ const SigninPage = styled.div`
   .input-group-text {
     background-color: ${({ theme }) => theme.primaryBackground};
     border: none;
+  }
+
+  .btn-facebook {
+    width: 100%;
+    font-family: Helvetica,sans-serif;
+    font-weight: 700;
+    -webkit-font-smoothing: antialiased;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 12px;
+    text-decoration: none;
+    transition: background-color .3s,border-color .3s;
+    background-color: #fff;
+    border: 0;
+    border-radius: 8px !important;
+    ft-radius: 8px;
+    font-size: 14px;
+    color: #4c69ba;
+    height: 50px;
+    text-align: center;
+  }
+
+  .btn-facebook:hover {
+      ${'' /* color: #fff; */}
+      opacity: 0.8;
+  }
+  .btn-facebook i.fa {
+    padding: 6px 10px;
+    background-color: #4c69ba;
+    color: #fff;
+    border-radius: 45%;
+    font-size: 25px;
+    margin-right: 15px;
   }
 `;
 

@@ -35,20 +35,21 @@ export const loginGoogle = createAsyncThunk(
   }
 );
 
-// export const loginGoogle = createAsyncThunk(
-//   "auth/postLoginGoogle",
-//   async (accessToken, { rejectWithValue }) => {
-//     try {
-//       const response = await accountsApi.loginGoogle({ access_token: accessToken });
-//       return { data: response.data, status: response.status };
-//     } catch (error) {
-//       return rejectWithValue({
-//         data: error.response.data,
-//         status: error.response.status,
-//       });
-//     }
-//   }
-// );
+export const loginFacebook = createAsyncThunk(
+  "auth/postLoginFacebook",
+  async (accessToken, { rejectWithValue }) => {
+    try {
+      const response = await accountsApi.loginFacebook({ access_token: accessToken });
+      return { data: response.data, status: response.status };
+    } catch (error) {
+      return rejectWithValue({
+        data: error.response.data,
+        status: error.response.status,
+      });
+    }
+  }
+);
+
 
 export const registerUser = createAsyncThunk(
   "auth/postRegisterUser",

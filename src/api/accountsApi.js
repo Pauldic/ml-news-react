@@ -10,8 +10,13 @@ const accounts = {
 
   loginGoogle: (data) => {
     return SuperFetch("/users/social/google/login/", {
-    // return SuperFetch("/accounts/social/google/login/", {
-    // return SuperFetch("/users/finalise/google/auth/", {
+      method: "post",
+      data,
+    });
+  },
+
+  loginFacebook: (data) => {
+    return SuperFetch("/users/social/facebook/login/", {
       method: "post",
       data,
     });

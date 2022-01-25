@@ -13,7 +13,7 @@ const users = {
   },
 
   updateProfile: ({ data }) => {
-    return superFetch(`/users/profiles/update`, {
+    return superFetch(`/users/profiles/update/`, {
       method: 'PUT',
       data,
     });
